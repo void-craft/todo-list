@@ -8,4 +8,4 @@ class Task(Base):
     description = Column(String)
 
     def __repr__(self):
-        return f"<Task id={self.id} title={self.title!r}>"
+        return f"<Task id={self.id} title={self.title!r} description={self.description}>"

@@ -8,22 +8,21 @@ from controllers.task_controller import (
     get_task_by_id, update_task, delete_task
 )
 
-
 def show_task_menu():
     print("=== TO-DO MENU ===")
     print("1. Crear tarea")
     print("2. Ver tareas")
-    print("3. Salir")
+    print("3. Buscar tarea por ID")
     print("4. Actualizar tarea")
     print("5. Eliminar tarea")
     print("6. Salir")
 
 def main():
     while True:
-        menu()
+        show_task_menu()
         choice = input("Elige una opción: ").strip()
         if choice == "1":
-            title = input("Título: ")
+            title = input("Título: ").lower()
             desc  = input("Descripción (opcional): ")
             task = create_task(title, desc)
             print(f"Creada: {task}")
@@ -49,4 +48,4 @@ def main():
             print("Opción no válida.")
 
 if __name__ == "__main__":
-    main()
+    main()    

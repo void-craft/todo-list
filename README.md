@@ -27,7 +27,7 @@ cd todo_list
 
 ```bash
 python -m venv venv
-.env\Scriptsctivate
+.venv/Scripts/Activate
 ```
 
 ### 3. Instala las dependencias
