@@ -15,6 +15,7 @@ def fondo_naranja(texto):
 
 def show_task_menu():
     print(Back.LIGHTRED_EX + Fore.LIGHTWHITE_EX + Style.BRIGHT + "\n +-+- Menú To-Do -+-+ ")
+    print(fondo_naranja(" 1. Crear tarea"))
     print(Back.YELLOW + Fore.LIGHTWHITE_EX + Style.BRIGHT + " 2. Ver tareas")
     print(Back.GREEN + Fore.LIGHTWHITE_EX + Style.BRIGHT + " 3. Buscar tarea por ID")
     print(Back.CYAN + Fore.LIGHTWHITE_EX + Style.BRIGHT + " 4. Actualizar tarea")
@@ -83,5 +84,4 @@ def main():
         except Exception as e:
             print(Fore.RED + f"⚠️  Error inesperado: {e}")
 
-if __name__ == "__main__":
-    main()
+

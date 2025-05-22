@@ -1,4 +1,3 @@
-
 # 📝 Proyecto TODO List - Python Vanilla + PostgreSQL
 
 Este proyecto es un ejemplo funcional de una aplicación de consola que permite gestionar tareas (CRUD) utilizando **Python**, **arquitectura MVC**, **SQLAlchemy** y **PostgreSQL**, sin frameworks.
