@@ -2,13 +2,13 @@
 from database.db import SessionLocal
 from models.task_model import Task
 
-def create_task(title: str, description: str = None):
+def create_task(title: str, fecha, description: str = None):
     db = SessionLocal()
     existing_task = db.query(Task).filter(Task.title == title).first()
     if existing_task:
         db.close()
         return {"error": "Ya existe una tarea con este título."}
-    task = Task(title=title, description=description)
+    task = Task(title=title, description=description, fecha=fecha)
     db.add(task)
     db.commit()
     db.refresh(task)
