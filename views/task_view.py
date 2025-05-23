@@ -9,9 +9,9 @@ from controllers.task_controller import (
 )
 
 def mostrar_tareas_como_tabla(tasks):
-    print("-" * 135)
+    print("-" * 122)
     print(Fore.CYAN + Style.BRIGHT + f"{'ID':<5} {'Título':<40} {'Descripción':<60} {'Fecha de tarea':<10}")
-    print("-" * 135)
+    print("-" * 122)
     
     for t in tasks:
         id_str = str(t.id)
@@ -20,7 +20,7 @@ def mostrar_tareas_como_tabla(tasks):
         fecha_str = t.fecha.strftime("%d/%m/%Y") if t.fecha else ''
         print(f"{id_str:<5} {titulo:<40} {descripcion:<60} {fecha_str:<15}")
     
-    print("-" * 120)
+    print("-" * 122)
 
 def show_task_menu():
     print(Fore.LIGHTRED_EX + Style.BRIGHT + "+-+- Menú To-Do -+-+ ")
@@ -70,20 +70,11 @@ def main():
                      + Style.BRIGHT + "\n📋 Lista de tareas:")
                     mostrar_tareas_como_tabla(tasks)    
 
-            # elif choice == "2":
-            #     tasks = get_all_tasks()
-            #     if not tasks:
-            #         print(Fore.YELLOW + "⚠️  No hay tareas registradas.")
-            #     else:
-            #         print(Fore.BLUE + Style.BRIGHT + "\n📋 Lista de tareas:")
-            #         for t in tasks:
-            #             print_task(t)
-
             elif choice == "3":
                 tid = int(input("🔍 ID de la tarea: "))
                 task = get_task_by_id(tid)
                 if task:
-                    print_task(task)
+                    mostrar_tareas_como_tabla([task]) 
                 else:
                     print(Fore.RED + "❌ Tarea no encontrada.")
 
@@ -91,6 +82,15 @@ def main():
                 tid = int(input("✏️  ID de la tarea a actualizar: "))
                 title = input("Nuevo título: ").strip()
                 desc = input("Nueva descripción: ").strip()
+                fecha_input = input("Nueva Fecha (DD/MM/AAAA): ").strip()
+                try:
+                    fecha = datetime.strptime(fecha_input, "%d/%m/%Y").date()
+                    if fecha < date.today():
+                        print(Fore.RED + "❌ La fecha no puede ser anterior a hoy.")
+                except ValueError:
+                    print(Fore.RED + "❌ Formato inválido. Usa DD/MM/AAAA.")
+                    return
+
                 updated = update_task(tid, title, desc)
                 if updated:
                     print(Fore.GREEN + "✅ Tarea actualizada.")
