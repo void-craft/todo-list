@@ -9,6 +9,7 @@ from controllers.task_controller import (
 )
 
 def mostrar_tareas_como_tabla(tasks):
+    tasks = sorted(tasks, key=lambda t: t.fecha or date.max)
     print("-" * 122)
     print(Fore.CYAN + Style.BRIGHT + f"{'ID':<5} {'Título':<40} {'Descripción':<60} {'Fecha de tarea':<10}")
     print("-" * 122)
@@ -17,10 +18,27 @@ def mostrar_tareas_como_tabla(tasks):
         id_str = str(t.id)
         titulo = t.title[:40] if t.title else ''
         descripcion = t.description[:60] if t.description else ''
-        fecha_str = t.fecha.strftime("%d/%m/%Y") if t.fecha else ''
+        if t.fecha:
+            if t.fecha < date.today():
+                color = Fore.RED
+            elif t.fecha == date.today():
+                color = Fore.LIGHTYELLOW_EX
+            else:
+                color = Fore.GREEN
+            fecha_str = color + t.fecha.strftime("%d/%m/%Y") + Style.RESET_ALL
+        else:
+            fecha_str = ''
+        
         print(f"{id_str:<5} {titulo:<40} {descripcion:<60} {fecha_str:<15}")
     
     print("-" * 122)
+    
+    leyenda = (
+        f"{Fore.GREEN}🟩 Pendiente{Style.RESET_ALL}  |    "
+        f"{Fore.YELLOW}🟨 Hoy{Style.RESET_ALL}  |    "
+        f"{Fore.RED}🟥 Finalizada{Style.RESET_ALL}"
+    )
+    print("\n " + leyenda + "\n")
 
 def show_task_menu():
     print(Fore.LIGHTRED_EX + Style.BRIGHT + "+-+- Menú To-Do -+-+ ")
@@ -41,26 +59,41 @@ def print_task(task):
 def main():
     while True:
         show_task_menu()
-        choice = input(Fore.GREEN + "\nElige una opción: ").strip()
+        choice = input(Fore.CYAN + "\nElige una opción: ").strip()
         print()
 
         try:
             if choice == "1":
                 title = input("📝 TÍTULO: ").strip()
+                title = input("Nuevo título: ").strip()
+                if not title:
+                    print(Fore.RED + "❌ El título no puede estar vacío.\n")
+                    continue
                 desc = input("🗒️  DESCRIPCIÓN (opcional): ").strip()
-                fecha_input = input("📅 FECHA DE TAREA(DD/MM/AAAA): ").strip()
+                fecha_input = input("Nueva Fecha (DDMMYYYY): ").strip()
 
+                # Validación del formato esperado (8 dígitos numéricos)
+                if not (fecha_input.isdigit() and len(fecha_input) == 8):
+                    print(Fore.RED + "❌ Formato inválido. Escribe la fecha como 8 dígitos: DDMMYYYY.")
+                    continue
+
+                # Insertar barras automáticamente
+                fecha_formateada = f"{fecha_input[:2]}/{fecha_input[2:4]}/{fecha_input[4:]}"
+
+                # Intentar convertir a fecha válida
                 try:
-                    fecha = datetime.strptime(fecha_input, "%d/%m/%Y").date()
+                    fecha = datetime.strptime(fecha_formateada, "%d/%m/%Y").date()
                     if fecha < date.today():
                         print(Fore.RED + "❌ La fecha no puede ser anterior a hoy.")
                         continue
                 except ValueError:
-                    print(Fore.RED + "❌ Formato de fecha inválido. Usa el formato DD/MM/AAAA (ej: 23/05/2025).")
+                    print(Fore.RED + "❌ Fecha inválida. Asegúrate de que la fecha existe.")
                     continue
 
+
                 task = create_task(title, fecha, desc)
-                print(Fore.GREEN + f"\n✅ TAREA CREADA: {task}")
+                print(Fore.GREEN + "\n✅ TAREA CREADA CON ÉXITO:\n")
+                
             elif choice == "2":
                 tasks = get_all_tasks()
                 if not tasks:
@@ -76,42 +109,81 @@ def main():
                 if task:
                     mostrar_tareas_como_tabla([task]) 
                 else:
-                    print(Fore.RED + "❌ Tarea no encontrada.")
+                    print(Fore.RED + "❌ Tarea no encontrada.\n")
 
             elif choice == "4":
-                tid = int(input("✏️  ID de la tarea a actualizar: "))
-                title = input("Nuevo título: ").strip()
-                desc = input("Nueva descripción: ").strip()
-                fecha_input = input("Nueva Fecha (DD/MM/AAAA): ").strip()
                 try:
-                    fecha = datetime.strptime(fecha_input, "%d/%m/%Y").date()
-                    if fecha < date.today():
-                        print(Fore.RED + "❌ La fecha no puede ser anterior a hoy.")
+                    tid = int(input("✏️  ID de la tarea a actualizar: "))
+                    task = get_task_by_id(tid)
+                    if not task:
+                        print(Fore.RED + "❌ Tarea no encontrada.\n")
                         continue
+
+                    print_task(task)
+
+                    title = input("\nNuevo título: ").strip()
+                    if not title:
+                        print(Fore.RED + "❌ El título no puede estar vacío.\n")
+                        continue
+
+                    desc = input("Nueva descripción: ").strip()
+                    fecha_input = input("Nueva Fecha (DDMMYYYY): ").strip()
+
+                    if not (fecha_input.isdigit() and len(fecha_input) == 8):
+                        print(Fore.RED + "❌ Formato inválido. Escribe la fecha como 8 dígitos: DDMMYYYY.\n")
+                        continue
+
+                    fecha_formateada = f"{fecha_input[:2]}/{fecha_input[2:4]}/{fecha_input[4:]}"
+                    try:
+                        fecha = datetime.strptime(fecha_formateada, "%d/%m/%Y").date()
+                        if fecha < date.today():
+                            print(Fore.RED + "❌ La fecha no puede ser anterior a hoy.\n")
+                            continue
+                    except ValueError:
+                        print(Fore.RED + "❌ Fecha inválida.")
+                        continue
+
+                    updated = update_task(tid, title, desc, fecha)
+                    if updated:
+                        print(Fore.GREEN + "\n🔄 TAREA ACTUALIZADA CON ÉXITO:")
+                        print_task(updated)
+                    else:
+                        print(Fore.RED + "❌ No se pudo actualizar.")
+
                 except ValueError:
-                    print(Fore.RED + "❌ Formato inválido. Usa DD/MM/AAAA.")
-                    continue
-            
-                updated = update_task(tid, title, desc)
-                if updated:
-                    print(Fore.GREEN + "✅ Tarea actualizada.")
-                else:
-                    print(Fore.RED + "❌ No se pudo actualizar.")
+                    print(Fore.RED + "❗ Entrada inválida. Ingresa un número para el ID.\n")
+
 
             elif choice == "5":
-                tid = int(input("🗑️  ID de la tarea a eliminar: "))
-                deleted = delete_task(tid)
-                print(Fore.GREEN + "🗑️  Tarea eliminada." if deleted else Fore.RED + "❌ Tarea no encontrada.")
+                try:
+                    tid = int(input("🗑️  ID de la tarea a eliminar: "))
+                    task = get_task_by_id(tid)
+                    if not task:
+                        print(Fore.RED + "❌ Tarea no encontrada.\n")
+                        continue
+
+                    print_task(task)
+                    confirm = input(Fore.YELLOW + "\n⚠️  ¿Estás seguro de que deseas eliminar esta tarea? (s/n):\n").strip().lower()
+                    if confirm != "s":
+                        print(Fore.CYAN + "🔄 Eliminación cancelada.\n")
+                        continue
+
+                    deleted = delete_task(tid)
+                    print(Fore.GREEN + "🗑️  Tarea eliminada." if deleted else Fore.RED + "❌ No se pudo eliminar.")
+
+                except ValueError:
+                    print(Fore.RED + "❗ ID inválido. Debe ser un número entero.\n")
 
             elif choice == "6":
-                print(Fore.CYAN + "\n👋 ¡Hasta luego!")
+                print(Fore.CYAN + "\n👋 ¡Hasta luego!\n")
                 break
 
             else:
-                print(Fore.RED + "❌ Opción no válida.")
+                print(Fore.RED + "❌ Opción no válida.\n"
+                "")
 
         except ValueError:
-            print(Fore.RED + "❗ Entrada inválida. Asegúrate de ingresar números donde corresponda.")
+            print(Fore.RED + "❗ Entrada inválida. Asegúrate de ingresar números donde corresponda.\n")
         except Exception as e:
             print(Fore.RED + f"⚠️  Error inesperado: {e}")
 
