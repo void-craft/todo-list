@@ -54,10 +54,10 @@ def main():
                     fecha = datetime.strptime(fecha_input, "%d/%m/%Y").date()
                     if fecha < date.today():
                         print(Fore.RED + "❌ La fecha no puede ser anterior a hoy.")
-                        return
+                        continue
                 except ValueError:
                     print(Fore.RED + "❌ Formato de fecha inválido. Usa el formato DD/MM/AAAA (ej: 23/05/2025).")
-                    return
+                    continue
 
                 task = create_task(title, fecha, desc)
                 print(Fore.GREEN + f"\n✅ TAREA CREADA: {task}")
@@ -87,10 +87,11 @@ def main():
                     fecha = datetime.strptime(fecha_input, "%d/%m/%Y").date()
                     if fecha < date.today():
                         print(Fore.RED + "❌ La fecha no puede ser anterior a hoy.")
+                        continue
                 except ValueError:
                     print(Fore.RED + "❌ Formato inválido. Usa DD/MM/AAAA.")
-                    return
-
+                    continue
+            
                 updated = update_task(tid, title, desc)
                 if updated:
                     print(Fore.GREEN + "✅ Tarea actualizada.")
