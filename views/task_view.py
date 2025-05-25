@@ -7,7 +7,6 @@ from controllers.task_controller import (create_task, get_all_tasks,
                                          get_task_by_id, update_task,
                                          delete_task)
 
-
 def display_tasks_in_table(tasks):
     """ Mostra tareas en forma tabla """
     tasks = sorted(tasks, key=lambda task: task.date or date.max)
@@ -41,7 +40,6 @@ def display_tasks_in_table(tasks):
               f"{Fore.RED}🟥 Finalizada{Style.RESET_ALL}")
     print("\n " + legend + "\n")
 
-
 def show_task_menu():
     """ Mostra el Menú """
     print("\n")
@@ -53,7 +51,6 @@ def show_task_menu():
     print(Fore.CYAN + Style.BRIGHT + " 4. Actualizar tarea")
     print(Fore.LIGHTBLUE_EX + Style.BRIGHT + " 5. Eliminar tarea")
     print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + " 6. Salir")
-
 
 def print_task(task):
     """ Imprima la tarea añadida"""
@@ -79,15 +76,7 @@ def main():
                 desc = input("Descripción (opcional): ").strip()
                 date_input = input("Nueva Fecha (DDMMYYYY, dejar vacío para hoy): ").strip()
     
-                if date_input:  # Solo valida si usuario escribe algo
-                    if not (date_input.isdigit() and len(date_input) == 8):
-                        print(Fore.RED + "Formato inválido. Escribe la fecha como 8 dígitos: DDMMYYYY.")
-                        continue
-        
-                    date_formateada = f"{date_input[:2]}/{date_input[2:4]}/{date_input[4:]}"
-                    task, error = create_task(title, date_formateada, desc)
-                else:
-                    task, error = create_task(title, None, desc)  # "None"(nada) llamará fecha por defecto
+                task, error = create_task(title, date_input, desc)
     
                 if error:
                     print(Fore.RED + f"\nError: {error}\n")
@@ -132,15 +121,7 @@ def main():
                     desc = input("Nueva descripción: ").strip()
                     date_input = input("Nueva Fecha (DDMMYYYY, dejar vacío para no cambiar): ").strip()
 
-                    if date_input:  # Solo valida si usuario escribe algo
-                        if not (date_input.isdigit() and len(date_input) == 8):
-                            print(Fore.RED + "Formato inválido. Escribe la fecha como 8 dígitos: DDMMYYYY.\n")
-                            continue
-
-                        date_formateada = f"{date_input[:2]}/{date_input[2:4]}/{date_input[4:]}"
-                        updated, error = update_task(tid, title, desc, date_formateada)
-                    else:
-                        updated, error = update_task(tid, title, desc)
+                    updated, error = update_task(tid, title, desc, date_input)
 
                     if error:
                         print(Fore.RED + f"\nError: {error}\n")
@@ -149,7 +130,8 @@ def main():
                         print_task(updated)
                     else:
                         print(Fore.RED + "No se pudo actualizar.")
-
+            
+            
                 except ValueError:
                     print(Fore.RED + "Entrada inválida. Ingresa un número para el ID.\n")
 

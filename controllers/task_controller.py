@@ -3,24 +3,33 @@ from database.db import SessionLocal
 from models.task_model import Task
 from datetime import date, datetime
 
+def _validate_date(date_str: str):
+    """Funcion ayudante - valida y analisa la fecha"""
+    if not date_str:
+        return None
+    
+    try:
+        if len(date_str) == 8 and date_str.isdigit():  # DDMMYYYY formato
+            date_str = f"{date_str[:2]}/{date_str[2:4]}/{date_str[4:]}"
+        
+        parsed_date = datetime.strptime(date_str, "%d/%m/%Y").date()
+        if parsed_date < date.today():
+            return None, "La fecha no puede ser anterior a hoy."
+        return parsed_date, None
+    except ValueError:
+        return None, "Fecha inválida. Asegúrate de que la fecha existe."
 
 def create_task(title: str, date_input: str = None, description: str = None):
-    """ Crea Una Tarea """
+    """Crea Una Tarea"""
     db = SessionLocal()
-    task_date = date.today()
-
-    if date_input:
-        # Si hay fecha, parse(analisa) y valida la fecha
-        try:
-            task_date = datetime.strptime(date_input, "%d/%m/%Y").date()
-            if task_date < date.today():
-                db.close()
-                return None, "La fecha no puede ser anterior a hoy."
-        except ValueError:
-            db.close()
-            return None, "Fecha inválida. Asegúrate de que la fecha existe."
     
-    # Si no fecha, deja SQLAlchemy usa le fecha del hoy
+    if date_input:
+        task_date, error = _validate_date(date_input)
+        if error:
+            db.close()
+            return None, error
+    else:
+        task_date = None
 
     task = Task(title=title, description=description, date=task_date)
     db.add(task)
@@ -29,25 +38,8 @@ def create_task(title: str, date_input: str = None, description: str = None):
     db.close()
     return task, None
 
-
-def get_all_tasks():
-    """ Mostra Todas las Tareas """
-    db = SessionLocal()
-    tasks = db.query(Task).all()
-    db.close()
-    return tasks
-
-
-def get_task_by_id(task_id: int):
-    """ Trea Tarea por ID """
-    db = SessionLocal()
-    task = db.query(Task).filter(Task.id == task_id).first()
-    db.close()
-    return task
-
-
 def update_task(task_id: int, title: str, description: str, date_input: str = None):
-    """ Actualize tarea """
+    """Actualiza tarea"""
     db = SessionLocal()
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
@@ -58,22 +50,30 @@ def update_task(task_id: int, title: str, description: str, date_input: str = No
     task.description = description
 
     if date_input:
-        try:
-            task_date = datetime.strptime(date_input, "%d/%m/%Y").date()
-            if task_date < date.today():
-                db.close()
-                return None, "La fecha no puede ser anterior a hoy."
-            task.date = task_date
-        except ValueError:
+        task_date, error = _validate_date(date_input)
+        if error:
             db.close()
-            return None, "Fecha inválida."
-    # Si no fecha, deja lo que existe
+            return None, error
+        task.date = task_date
 
     db.commit()
     db.refresh(task)
     db.close()
     return task, None
 
+def get_all_tasks():
+    """ Mostra Todas las Tareas """
+    db = SessionLocal()
+    tasks = db.query(Task).all()
+    db.close()
+    return tasks
+
+def get_task_by_id(task_id: int):
+    """ Trea Tarea por ID """
+    db = SessionLocal()
+    task = db.query(Task).filter(Task.id == task_id).first()
+    db.close()
+    return task
 
 def delete_task(task_id: int):
     """ Borra una Tarea por ID """
