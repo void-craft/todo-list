@@ -8,7 +8,7 @@ from controllers.task_controller import (
     get_task_by_id, update_task, delete_task
 )
 
-def mostrar_tareas_como_tabla(tasks):
+def display_tasks_in_table(tasks):
     tasks = sorted(tasks, key=lambda task: task.date or date.max)
     print("-" * 122)
     print(Fore.CYAN + Style.BRIGHT + f"{'ID':<5} {'Título':<40} {'Descripción':<60} {'Fecha de tarea':<10}")
@@ -33,12 +33,12 @@ def mostrar_tareas_como_tabla(tasks):
     
     print("-" * 122)
     
-    leyenda = (
+    legend = (
         f"{Fore.GREEN}🟩 Pendiente{Style.RESET_ALL}  |    "
         f"{Fore.YELLOW}🟨 Hoy{Style.RESET_ALL}  |    "
         f"{Fore.RED}🟥 Finalizada{Style.RESET_ALL}"
     )
-    print("\n " + leyenda + "\n")
+    print("\n " + legend + "\n")
 
 def show_task_menu():
     print(Fore.LIGHTRED_EX + Style.BRIGHT + "+-+- Menú To-Do -+-+ ")
@@ -89,7 +89,7 @@ def main():
 
 
                 task = create_task(title, date, desc)
-                print(Fore.GREEN + "\nTAREA CREADA CON ÉXITO:\n")
+                print(Fore.GREEN + "\nTarea Creada Con Éxito: \n")
                 
             elif choice == "2":
                 tasks = get_all_tasks()
@@ -98,13 +98,13 @@ def main():
                 else:
                     print(Fore.YELLOW
                      + Style.BRIGHT + "\nLista de tareas:")
-                    mostrar_tareas_como_tabla(tasks)    
+                    display_tasks_in_table(tasks)    
 
             elif choice == "3":
                 tid = int(input("ID de la tarea: "))
                 task = get_task_by_id(tid)
                 if task:
-                    mostrar_tareas_como_tabla([task]) 
+                    display_tasks_in_table([task]) 
                 else:
                     print(Fore.RED + "Tarea no encontrada.\n")
 
