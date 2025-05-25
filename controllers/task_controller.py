@@ -3,9 +3,9 @@ from database.db import SessionLocal
 from models.task_model import Task
 from datetime import date
 
-def create_task(title: str, fecha: date, description: str = None):
+def create_task(title: str, date: date, description: str = None):
     db = SessionLocal()
-    task = Task(title=title, description=description, fecha=fecha)
+    task = Task(title=title, description=description, date=date)
     db.add(task)
     db.commit()
     db.refresh(task)
@@ -24,17 +24,18 @@ def get_task_by_id(task_id: int):
     db.close()
     return task
 
-def update_task(task_id: int, title: str, description: str, fecha: date):
+def update_task(task_id: int, title: str, description: str, date: date):
     db = SessionLocal()
     task = db.query(Task).filter(Task.id == task_id).first()
     if task:
         task.title = title
         task.description = description
-        task.fecha = fecha  
+        task.date = date  
         db.commit()
         db.refresh(task)
     db.close()
     return task
+
 def delete_task(task_id: int):
     db = SessionLocal()
     task = db.query(Task).filter(Task.id == task_id).first()
