@@ -10,170 +10,110 @@ from controllers.task_controller import (
 
 # TESTS DE VALIDACIÓN
 @pytest.mark.validate
-def test_tc001_validar_fecha_valida(setup_database):
-    """
-    CASO TC-001: Validar fecha futura válida
-    ENTRADA: Fecha de mañana en formato DDMMYYYY
-    ESPERADO: Fecha válida sin errores
-    """
+def test_tc001_validate_valid_date(setup_database):
     mañana = date.today() + timedelta(days=1)
-    fecha_str = mañana.strftime("%d%m%Y")
+    date_str = mañana.strftime("%d%m%Y")
     
-    fecha_resultado, error = _validate_date(fecha_str)
+    validated_date, error = _validate_date(date_str)
     
     assert error is None
-    assert fecha_resultado == mañana
-    print(f"✅ TC-001: Fecha {fecha_str} validada correctamente")
+    assert validated_date == mañana
+    print(f"✅ TC-001: Fecha {date_str} validada correctamente")
 
 @pytest.mark.validate  
-def test_tc007_error_fecha_invalida(setup_database):
-    """
-    CASO TC-007: Error con fecha inválida
-    ENTRADA: Fecha que no existe (99999999)
-    ESPERADO: Error de fecha inválida
-    """
-    fecha_resultado, error = _validate_date("99999999")
+def test_tc007_error_invalid_date(setup_database):
+    fecha_str = "99999999"
+    validated_date, error = _validate_date(fecha_str)
     
-    assert fecha_resultado is None
+    assert validated_date is None
     assert "Fecha inválida" in error
     print(f"✅ TC-007: Error de fecha inválida detectado correctamente")
 
 # TESTS DE CREAR
 @pytest.mark.create
-def test_tc002_crear_tarea_basica(setup_database):
-    """
-    CASO TC-002: Crear tarea con título solamente
-    ENTRADA: title="Mi tarea de prueba"
-    ESPERADO: Tarea creada exitosamente
-    """
-    tarea, error = create_task("Mi tarea de prueba")
+def test_tc002_create_basic_task(setup_database):
+    task, error = create_task("Mi tarea de prueba")
     
     assert error is None
-    assert tarea is not None
-    assert tarea.title == "Mi tarea de prueba"
-    assert tarea.id is not None
-    print(f"✅ TC-002: Tarea creada con ID {tarea.id}")
+    assert task is not None
+    assert task.title == "Mi tarea de prueba"
+    assert task.id is not None
+    print(f"✅ TC-002: Tarea creada con ID {task.id}")
 
 # TESTS DE LEER
 @pytest.mark.read
-def test_tc003_obtener_tarea_por_id(setup_database):
-    """
-    CASO TC-003: Obtener tarea existente por ID
-    ENTRADA: ID de tarea que existe
-    ESPERADO: Tarea encontrada correctamente
-    """
-    # Crear tarea primero
-    tarea_creada, _ = create_task("Tarea para buscar")
+def test_tc003_get_task_by_id(setup_database):
+    created_task, _ = create_task("Tarea para buscar")
+    found_task = get_task_by_id(created_task.id)
     
-    # Buscar por ID
-    tarea_encontrada = get_task_by_id(tarea_creada.id)
-    
-    assert tarea_encontrada is not None
-    assert tarea_encontrada.title == "Tarea para buscar"
-    print(f"✅ TC-003: Tarea encontrada por ID {tarea_creada.id}")
+    assert found_task is not None
+    assert found_task.title == "Tarea para buscar"
+    print(f"✅ TC-003: Tarea encontrada por ID {created_task.id}")
 
 @pytest.mark.read
-def test_tc004_obtener_todas_las_tareas(setup_database):
-    """
-    CASO TC-004: Obtener lista de todas las tareas
-    ENTRADA: 2 tareas creadas previamente
-    ESPERADO: Lista con 2 tareas
-    """
-    # Crear tareas
+def test_tc004_get_all_tasks(setup_database):
     create_task("Tarea 1")
     create_task("Tarea 2")
     
-    # Obtener todas
-    tareas = get_all_tasks()
+    tasks = get_all_tasks()
     
-    assert len(tareas) == 2
-    titulos = [t.title for t in tareas]
-    assert "Tarea 1" in titulos
-    assert "Tarea 2" in titulos
-    print(f"✅ TC-004: {len(tareas)} tareas obtenidas correctamente")
+    assert len(tasks) == 2
+    titles = [t.title for t in tasks]
+    assert "Tarea 1" in titles
+    assert "Tarea 2" in titles
+    print(f"✅ TC-004: {len(tasks)} tareas obtenidas correctamente")
 
 # TESTS DE ACTUALIZAR
 @pytest.mark.update
-def test_tc005_actualizar_tarea(setup_database):
-    """
-    CASO TC-005: Actualizar tarea existente
-    ENTRADA: Tarea existente con nuevos datos
-    ESPERADO: Tarea actualizada correctamente
-    """
-    # Crear tarea
-    tarea_original, _ = create_task("Título original")
+def test_tc005_update_task(setup_database):
+    original_task, _ = create_task("Título original")
     
-    # Actualizar
-    tarea_actualizada, error = update_task(
-        tarea_original.id,
+    updated_task, error = update_task(
+        original_task.id,
         "Título actualizado", 
         "Nueva descripción"
     )
     
     assert error is None
-    assert tarea_actualizada.title == "Título actualizado"
-    assert tarea_actualizada.description == "Nueva descripción"
-    print(f"✅ TC-005: Tarea ID {tarea_original.id} actualizada")
+    assert updated_task.title == "Título actualizado"
+    assert updated_task.description == "Nueva descripción"
+    print(f"✅ TC-005: Tarea ID {original_task.id} actualizada")
 
 # TESTS DE ELIMINAR
 @pytest.mark.delete
-def test_tc006_eliminar_tarea(setup_database):
-    """
-    CASO TC-006: Eliminar tarea existente
-    ENTRADA: ID de tarea que existe
-    ESPERADO: Tarea eliminada correctamente
-    """
-    # Crear tarea
-    tarea_creada, _ = create_task("Tarea a eliminar")
-    tarea_id = tarea_creada.id
+def test_tc006_delete_task(setup_database):
+    created_task, _ = create_task("Tarea a eliminar")
+    task_id = created_task.id
     
-    # Eliminar
-    tarea_eliminada = delete_task(tarea_id)
+    deleted_task = delete_task(task_id)
     
-    # Verificar eliminación
-    assert tarea_eliminada is not None
-    assert get_task_by_id(tarea_id) is None
-    print(f"✅ TC-006: Tarea ID {tarea_id} eliminada correctamente")
+    assert deleted_task is not None
+    assert get_task_by_id(task_id) is None
+    print(f"✅ TC-006: Tarea ID {task_id} eliminada correctamente")
 
 # TEST DE INTEGRACIÓN
 @pytest.mark.integration
-def test_tc008_crud_completo(setup_database):
-    """
-    CASO TC-008: Flujo CRUD completo
-    ENTRADA: Operaciones crear, leer, actualizar, eliminar
-    ESPERADO: Todas las operaciones funcionan en secuencia
-    """
-    # 1. CREAR
-    tarea, error = create_task("Tarea CRUD", description="Prueba completa")
+def test_tc008_full_crud_flow(setup_database):
+    task, error = create_task("Tarea CRUD", description="Prueba completa")
     assert error is None
-    print(f"  ➤ Crear: Tarea ID {tarea.id} creada")
+    print(f"  ➤ Crear: Tarea ID {task.id} creada")
     
-    # 2. LEER
-    tarea_leida = get_task_by_id(tarea.id)
-    assert tarea_leida.title == "Tarea CRUD"
-    print(f"  ➤ Leer: Tarea ID {tarea.id} leída")
+    read_task = get_task_by_id(task.id)
+    assert read_task.title == "Tarea CRUD"
+    print(f"  ➤ Leer: Tarea ID {task.id} leída")
     
-    # 3. ACTUALIZAR
-    tarea_actualizada, error = update_task(
-        tarea.id, "Tarea CRUD Actualizada", "Descripción nueva"
+    updated_task, error = update_task(
+        task.id, "Tarea CRUD Actualizada", "Descripción nueva"
     )
     assert error is None
-    assert tarea_actualizada.title == "Tarea CRUD Actualizada"
-    print(f"  ➤ Actualizar: Tarea ID {tarea.id} actualizada")
+    assert updated_task.title == "Tarea CRUD Actualizada"
+    print(f"  ➤ Actualizar: Tarea ID {task.id} actualizada")
     
-    # 4. ELIMINAR
-    tarea_eliminada = delete_task(tarea.id)
-    assert tarea_eliminada is not None
-    assert get_task_by_id(tarea.id) is None
-    print(f"  ➤ Eliminar: Tarea ID {tarea.id} eliminada")
+    deleted_task = delete_task(task.id)
+    assert deleted_task is not None
+    assert get_task_by_id(task.id) is None
+    print(f"  ➤ Eliminar: Tarea ID {task.id} eliminada")
     
     print(f"✅ TC-008: Flujo CRUD completo exitoso")
 
-# FUNCIONES AUXILIARES PARA REPORTES
-def pytest_runtest_setup(item):
-    """Ejecuta antes de cada test para mostrar información"""
-    print(f"\n🧪 Ejecutando: {item.name}")
 
-def pytest_runtest_teardown(item):
-    """Ejecuta después de cada test"""
-    print(f"📋 Completado: {item.name}")

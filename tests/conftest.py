@@ -43,3 +43,12 @@ def test_case_info(request):
         'description': getattr(request.node, 'description', 'Sin descripción'),
         'test_name': request.node.name
     }
+    
+# FUNCIONES AUXILIARES PARA REPORTES
+def pytest_runtest_setup(item):
+    """ Despues Fixture Setup, Antes Test"""
+    print(f"\n🧪 Ejecutando: {item.name}")
+
+def pytest_runtest_teardown(item):
+    """ Despues Test, Despues Fixture Teardown """
+    print(f"📋 Completado: {item.name}")

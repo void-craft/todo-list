@@ -43,7 +43,7 @@ def display_tasks_in_table(tasks):
 def show_task_menu():
     """ Mostra el Menú """
     print("\n")
-    print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + "-+" * 61)
+    print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + "-+" * 40)
     print(Fore.LIGHTRED_EX + Style.BRIGHT + "\n+-+- Menú To-Do -+-+ \n")
     print("\033[38;5;208m\033[1m 1. Crear tarea\033[0m")
     print(Fore.LIGHTYELLOW_EX + Style.BRIGHT + " 2. Ver tareas")
