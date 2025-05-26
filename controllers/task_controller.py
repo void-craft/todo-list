@@ -29,7 +29,7 @@ def create_task(title: str, date_input: str = None, description: str = None):
             db.close()
             return None, error
     else:
-        task_date = None
+        task_date = date.today()
 
     task = Task(title=title, description=description, date=task_date)
     db.add(task)
