@@ -131,6 +131,7 @@ def handle_update_task():
         elif updated:
             print(COLOR_SUCCESS + "\nTAREA ACTUALIZADA CON ÉXITO:")
             print_task(updated)
+           
         else:
             print(COLOR_ERROR + "No se pudo actualizar.")
     except ValueError:
@@ -160,7 +161,7 @@ def handle_delete_task():
         print(COLOR_ERROR + "ID inválido. Debe ser un número entero.\n")
 
 
-# 🧠 Menú principal
+#  Menú principal
 def main():
     while True:
         show_task_menu()
