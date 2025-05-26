@@ -1,145 +1,56 @@
-# 📝 Proyecto TODO List - Python Vanilla + PostgreSQL
+# To-Do Application 📝
 
-Este proyecto es un ejemplo funcional de una aplicación de consola que permite gestionar tareas (CRUD) utilizando **Python**, **arquitectura MVC**, **SQLAlchemy** y **PostgreSQL**, sin frameworks.
+**Developers:** Sergio, Hema
 
----
+A colorful command-line task manager built with Python, SQLAlchemy, and Alembic for database migrations.
 
-## 📦 Requisitos previos
+## Features
+- ✅ Create, view, update, and delete tasks
+- 📅 Date management with validation
+- 🎨 Color-coded interface (Green: future, Yellow: today, Red: overdue)
+- 🗄️ Database migrations with Alembic
+- 🧪 Complete test suite with pytest
 
-- Python 3.10 o superior
-- PostgreSQL instalado
-- Acceso a `psql` desde consola
-- Git (opcional)
-
----
-
-## ⚙️ Configuración inicial
-
-### 1. Clona el repositorio (si es necesario)
-
-```bash
-git clone <url-del-repo>
-cd todo_list
-```
-
-### 2. Crea y activa entorno virtual
-
-```bash
-python -m venv venv
-.venv/Scripts/Activate
-```
-
-### 3. Instala las dependencias
-
+## Quick Start
 ```bash
 pip install -r requirements.txt
-```
-
----
-
-## 🛠️ Base de datos
-
-### 1. Crea la base de datos en PostgreSQL
-
-Usa este comando (fuera del entorno virtual):
-
-```bash
-psql -U postgres -c "CREATE DATABASE todo_db;"
-```
-
-> Asegúrate de tener acceso a `psql` y que tu contraseña sea `1234`.  
-> Puedes modificarla en `database/db.py`.
-
----
-
-## 🔗 Conexión a PostgreSQL
-
-Edita `database/db.py` y asegúrate de que esta línea esté así:
-
-```python
-DATABASE_URL = "postgresql+pg8000://postgres:1234@localhost/todo_db"
-```
-
-> Usamos el driver `pg8000` en lugar de `psycopg2`.
-
----
-
-## 🔄 Migraciones
-
-### 1. Inicializa Alembic (si no está hecho)
-
-```bash
-alembic init alembic
-```
-
-### 2. Configura Alembic
-
-- En `alembic.ini` revisa:
-
-  ```ini
-  sqlalchemy.url = postgresql+pg8000://postgres:1234@localhost/todo_db
-  ```
-
-- En `alembic/env.py`, importa el modelo y apunta a los metadatos:
-
-  ```python
-  from database.db import Base
-  from models.task_model import Task
-  target_metadata = Base.metadata
-  ```
-
-### 3. Crea y aplica la migración
-
-```bash
-alembic revision --autogenerate -m "crear tabla tasks"
 alembic upgrade head
+python main.py
 ```
 
----
+## Usage
+- **Date format:** DDMMYYYY (e.g., 25122024)
+- **Menu options:** 1-Create, 2-View, 3-Search, 4-Update, 5-Delete, 6-Exit
 
-## 🚀 Ejecutar la aplicación
-
-Lanza el menú desde la raíz del proyecto:
-
+## Testing
 ```bash
-python views/task_view.py
+pytest                    # Run all tests
+pytest -m create         # Creation tests only
+pytest -v               # Verbose output
 ```
 
-Y verás:
-
+## Project Structure
 ```
---- MENÚ TO-DO LIST ---
-1. Crear tarea
-2. Ver todas las tareas
-3. Ver tarea por ID
-4. Actualizar tarea
-5. Eliminar tarea
-6. Salir
-```
-
----
-
-## 🧠 Estructura del proyecto
-
-```
-todo_list/
-│
-├── alembic/              # Archivos de migración
-├── controllers/          # Lógica de negocio (CRUD)
-├── database/             # Conexión a la DB
-├── models/               # Definición de modelos SQLAlchemy
-├── views/                # Interfaz por consola
-│
-├── alembic.ini
-├── requirements.txt
-├── README.md
+├── controllers/task_controller.py    # Business logic
+├── database/db.py                    # Database
+├── models/task_model.py              # SQLAlchemy model
+├── alembic/                          # Database migrations
+├── tests/                            # Test suite
+│   ├── conftest.py
+│   └── test_tasks.py
+├── views/task_view.py                # View
+└── main.py                           # Main interface
+└── alembic.ini
+└── pytest.ini
+└── README.md
+└── requirements.txt
 ```
 
----
-
-## 🧹 Notas finales
-
-- No necesitas frontend, puedes ver la salida por consola.
-- El objetivo es entender cómo se estructura un proyecto con MVC y SQLAlchemy.
-
-¡Disfruta programando! 🐍✨
+## Test Cases
+- **TC-001:** Date validation
+- **TC-002:** Task creation
+- **TC-003-004:** Task retrieval
+- **TC-005:** Task updates
+- **TC-006:** Task deletion
+- **TC-007:** Error handling
+- **TC-008:** Full CRUD integration
