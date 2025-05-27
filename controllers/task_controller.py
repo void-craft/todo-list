@@ -4,7 +4,7 @@ from models.task_model import Task
 from datetime import date, datetime
 
 def _validate_date(date_str: str):
-    """Funcion ayudante - valida y analisa la fecha"""
+    """Funcion ayudante - valida y analisa la date"""
     if not date_str:
         return None
     
